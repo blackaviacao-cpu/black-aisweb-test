@@ -1,43 +1,114 @@
 <!doctype html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>AISWEB Teste</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Teste AISWEB BLACK</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#081225;
+      color:#fff;
+      margin:0;
+      padding:40px;
+    }
+    .wrap{
+      max-width:800px;
+      margin:0 auto;
+    }
+    .card{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(148,163,184,.2);
+      border-radius:16px;
+      padding:24px;
+    }
+    h1{
+      margin-top:0;
+      margin-bottom:20px;
+    }
+    label{
+      display:block;
+      margin-bottom:6px;
+      color:#9ca3af;
+      font-size:13px;
+    }
+    input{
+      width:100%;
+      box-sizing:border-box;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.25);
+      background:#020617;
+      color:#fff;
+      margin-bottom:16px;
+    }
+    button{
+      padding:12px 16px;
+      border-radius:10px;
+      border:1px solid #38bdf8;
+      background:transparent;
+      color:#fff;
+      cursor:pointer;
+    }
+    button:hover{
+      background:rgba(56,189,248,.08);
+    }
+    pre{
+      margin-top:20px;
+      background:#020617;
+      border:1px solid rgba(148,163,184,.2);
+      border-radius:12px;
+      padding:16px;
+      white-space:pre-wrap;
+    }
+  </style>
 </head>
-<body style="font-family:Arial;padding:40px">
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Teste AISWEB BLACK</h1>
 
-<h2>Teste AISWEB</h2>
+      <label>ICAO</label>
+      <input id="icao" placeholder="Ex: SBBH" />
 
-ICAO:
-<input id="icao" placeholder="SBBH">
+      <label>EOBT</label>
+      <input id="eobt" type="datetime-local" />
 
-<br><br>
+      <button onclick="analisar()">Analisar</button>
 
-EOBT:
-<input id="eobt" type="datetime-local">
+      <pre id="resultado">Aguardando análise...</pre>
+    </div>
+  </div>
 
-<br><br>
+  <script>
+    async function analisar(){
+      const icao = document.getElementById("icao").value.trim().toUpperCase();
+      const eobt = document.getElementById("eobt").value;
+      const out = document.getElementById("resultado");
 
-<button onclick="analisar()">Analisar</button>
+      if(!icao || !eobt){
+        alert("Preencha ICAO e EOBT.");
+        return;
+      }
 
-<pre id="resultado"></pre>
+      out.textContent = "Consultando worker...";
 
-<script>
-async function analisar(){
-  const icao = document.getElementById("icao").value;
-  const eobt = document.getElementById("eobt").value;
+      try{
+        const r = await fetch("https://aisweb-check.blackaviacao.workers.dev", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ icao, eobt })
+        });
 
-  const r = await fetch("/api/check", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({icao, eobt})
-  });
+        const data = await r.json();
 
-  const data = await r.json();
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(data, null, 2);
-}
-</script>
-
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch(err){
+        out.textContent = "Erro: " + err.message;
+      }
+    }
+  </script>
 </body>
 </html>
