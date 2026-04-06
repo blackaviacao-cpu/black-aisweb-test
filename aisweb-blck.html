@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+  <title>AISWEB Teste</title>
+</head>
+<body style="font-family:Arial;padding:40px">
+
+<h2>Teste AISWEB</h2>
+
+ICAO:
+<input id="icao" placeholder="SBBH">
+
+<br><br>
+
+EOBT:
+<input id="eobt" type="datetime-local">
+
+<br><br>
+
+<button onclick="analisar()">Analisar</button>
+
+<pre id="resultado"></pre>
+
+<script>
+async function analisar(){
+  const icao = document.getElementById("icao").value;
+  const eobt = document.getElementById("eobt").value;
+
+  const r = await fetch("/api/check", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({icao, eobt})
+  });
+
+  const data = await r.json();
+
+  document.getElementById("resultado").textContent =
+    JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
